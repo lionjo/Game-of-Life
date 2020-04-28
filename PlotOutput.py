@@ -26,7 +26,7 @@ def showinit(Array,color='gray'):
     plt.show()
 
 
-def animatethisplease(Array,color='gray'):
+def animatethisplease(Array,color='gray',delay=200):
     shape = np.shape(Array)
 
     if(len(shape)!=3):
@@ -42,16 +42,16 @@ def animatethisplease(Array,color='gray'):
 
     ims = []
     for i in range(0,d):
-        im = plt.imshow(Array[:,:,i],cmap ='gray',animated=True)
+        im = plt.imshow(Array[:,:,i],cmap = color,animated=True)
         
         ims.append([im])
 
     
-    ani = animation.ArtistAnimation(fig, ims,repeat=False,interval=200)
+    ani = animation.ArtistAnimation(fig, ims,repeat=False,interval=delay)
 
    
 
-    fig.tight_layout()
+    #fig.tight_layout()
     plt.show()
 
 
@@ -59,10 +59,3 @@ def animatethisplease(Array,color='gray'):
     plt.show()
 
 
-aspectratio = 1.2
-size = 40
-
-testarray = np.random.random_integers(0,high=1, size=(40,int(40*aspectratio),100))
-
-
-animatethisplease(testarray)
