@@ -24,7 +24,7 @@ class GameofLife(Tk.Frame):
 
         self.speed = speed
 
-
+        self.arr = np.random.randint(0,high=2, size=(int(self.height/self.mult),int(self.width/self.mult))).astype(bool)
         self.init_pic()
 
     def init_pic(self):
@@ -33,8 +33,6 @@ class GameofLife(Tk.Frame):
         """
         self.parent.title("Our Game of Life")       
         
-        self.arr = np.random.randint(0,high=2, size=(int(self.height/self.mult),int(self.width/self.mult))).astype(bool)
-
         self.parent.grid_rowconfigure(0,weight=0)
         self.parent.grid_columnconfigure(0,weight=0)
 
@@ -147,7 +145,15 @@ class GameofLife(Tk.Frame):
         filename = Tk.filedialog.askopenfilename(initialdir=os.getcwd(),filetypes=[("Text Files", "*.dat")])
         loadedarr = np.loadtxt(filename)
 
+        width, height = loadedarr.shape
+
+        self.width = width * self.mult
+        self.height = height * self.mult
+
         self.arr = loadedarr.astype(bool)
+
+        self.clear()
+        self.init_pic()
         self.update_img()
 
     def adjustspeed(self):
@@ -176,6 +182,7 @@ class GameofLife(Tk.Frame):
         self.mult = res
        
         self.clear()
+        self.arr = np.random.randint(0,high=2, size=(int(self.height/self.mult),int(self.width/self.mult))).astype(bool)
         self.init_pic() 
 
 

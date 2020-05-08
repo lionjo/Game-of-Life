@@ -10,10 +10,6 @@ def next_step(arr):
 
     return(np.roll(arr,1,axis=0))
 
-def evolve(arr):
-
-    return(np.roll(arr,1,axis=0))
-
 
 
 
