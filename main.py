@@ -1,12 +1,5 @@
-from PlotOutput import animatethisplease
-import numpy as np
+from Window import main
 
-
-
-
-testarray = np.random.random_integers(0,high=1, size=(40,40,100))
-
-
-animatethisplease(testarray,delay=400)
-
-
+# Main program       
+if __name__=="__main__":
+    main(800,800,10,1000)

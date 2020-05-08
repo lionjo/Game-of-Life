@@ -5,13 +5,13 @@ import PIL.Image, PIL.ImageTk
 import numpy as np
 import os
 
-
+from Run import next_step
 
 class GameofLife(Tk.Frame):
     '''
     Dislay an image on Tkinter.Canvas and delete it on button click
     '''
-    def __init__(self, parent,width,height,res):
+    def __init__(self, parent,width,height,res,speed=1000):
         '''
         Inititialize the GUI with a button and a Canvas objects
         '''
@@ -22,6 +22,9 @@ class GameofLife(Tk.Frame):
         self.height = height
         self.mult = res
 
+        self.speed = speed
+
+
         self.init_pic()
 
     def init_pic(self):
@@ -30,16 +33,16 @@ class GameofLife(Tk.Frame):
         """
         self.parent.title("Our Game of Life")       
         
-        self.arr =np.random.randint(0,high=2, size=(int(self.height/self.mult),int(self.width/self.mult))).astype(bool)
+        self.arr = np.random.randint(0,high=2, size=(int(self.height/self.mult),int(self.width/self.mult))).astype(bool)
 
         self.parent.grid_rowconfigure(0,weight=0)
         self.parent.grid_columnconfigure(0,weight=0)
 
-        self.parent.grid_columnconfigure(5,weight=1)
+        self.parent.grid_columnconfigure(6,weight=1)
         self.parent.grid_columnconfigure(0,weight=1)
 
         # Create a button and append it  a callback method to clear the image          
-        self.button_run = Tk.Button(self.parent, text = 'Run', command = self.runthingy)
+        self.button_run = Tk.Button(self.parent, text = 'Start', command = self.runthingy)
         self.button_run.grid(row = 1, column = 0, sticky = "e")
 
         # Create another button         
@@ -53,13 +56,18 @@ class GameofLife(Tk.Frame):
         self.button_save.grid(row = 1, column =3)
 
         self.button_open = Tk.Button(self.parent, text = 'Open', command = self.open)
-        self.button_open.grid(row = 1, column =4,sticky="w")
+        self.button_open.grid(row = 1, column =4)
 
-        self.button_adjust = Tk.Button(self.parent, text = 'Adjust', command = self.changesize)
-        self.button_adjust.grid(row = 1, column =5,sticky="w")
+        self.button_adjust = Tk.Button(self.parent, text = 'Size', command = self.changesize)
+        self.button_adjust.grid(row = 1, column =5)
+
+        self.button_speed = Tk.Button(self.parent, text = 'Speed', command = self.adjustspeed)
+        self.button_speed.grid(row = 1, column =6,sticky="w")
 
         self.canvas = Tk.Canvas(self.parent, width = self.width, height = self.height)
-        self.canvas.grid(row = 0,columnspan = 6)
+        self.canvas.grid(row = 0,columnspan = 7)
+
+
 
         self.canvas.bind("<Button-1>", self.callback)
 
@@ -91,12 +99,7 @@ class GameofLife(Tk.Frame):
         self.update_img()
 
         
-
-    @staticmethod
-    def arr2photo(arr):
-        myphoto=PIL.Image.fromarray(arr).resize((self.width,self.height),0)
-        return PIL.ImageTk.PhotoImage(image = myphoto)
-    
+   
     def update_img(self):
         self.myphoto = PIL.Image.fromarray(self.arr).resize((self.width,self.height),0)
         self.photo = PIL.ImageTk.PhotoImage(image = self.myphoto)
@@ -104,7 +107,32 @@ class GameofLife(Tk.Frame):
 
 
     def runthingy(self):
-        pass
+        self.evolve()
+
+        self.button_open['state'] = 'disabled'
+        self.button_save['state'] = 'disabled'
+        self.button_reset['state'] = 'disabled'
+        self.button_random['state'] = 'disabled' 
+        self.button_adjust['state'] = 'disabled'   
+
+        self.button_run.configure(text = 'Stop', command = self.stopthingy)
+
+    def stopthingy(self):
+        self.parent.after_cancel(self.cancelid)
+
+        self.button_open['state'] = 'normal'
+        self.button_save['state'] = 'normal'
+        self.button_reset['state'] = 'normal'
+        self.button_random['state'] = 'normal' 
+        self.button_adjust['state'] = 'normal'   
+
+
+        self.button_run.configure(text = 'Start', command = self.runthingy)
+
+    def evolve(self):
+        self.arr = next_step(self.arr)
+        self.update_img()
+        self.cancelid = self.parent.after(self.speed,self.evolve)
 
     def reset(self):
         self.arr = np.zeros(self.arr.shape).astype(bool)
@@ -122,7 +150,8 @@ class GameofLife(Tk.Frame):
         self.arr = loadedarr.astype(bool)
         self.update_img()
 
-        
+    def adjustspeed(self):
+        self.speed = Tk.simpledialog.askinteger("Adjust Update Pause","Milliseconds:",initialvalue=1000)
 
 
     def save(self):
@@ -140,17 +169,26 @@ class GameofLife(Tk.Frame):
 
         if not width or not height or not res:
             return
-            
+
 
         self.width = width
         self.height = height
         self.mult = res
        
-        self.init_pic()
+        self.clear()
+        self.init_pic() 
+
+
+    def clear(self):
+        list = self.parent.grid_slaves()
+        for l in list:
+            l.destroy()
+
+
 
 # Main method
-def main(width=400,height=400,res=10):
+def main(width=400,height=400,res=10,speed=1000):
     root=Tk.Tk()
-    d=GameofLife(root,width,height,res)
+    GameofLife(root,width,height,res)
     root.mainloop()
 
