@@ -2,4 +2,4 @@ from Window import main
 
 # Main program       
 if __name__=="__main__":
-    main(800,800,10,100)
+    main(400,400,10,100)

@@ -6,6 +6,7 @@ import numpy as np
 import os
 
 from Rules import next_step
+from RuleWindow import RuleWindow
 
 class GameofLife(Tk.Frame):
     '''
@@ -23,7 +24,8 @@ class GameofLife(Tk.Frame):
         self.mult = res
 
         self.speed = speed
-        self.rule = np.array([[0,0,1,1,1,0,0,0,0],[0,0,1,0,1,0,0,1,1]])
+        self.rule = np.array([[0,0,0,1,0,0,0,0,0],[0,0,1,1,0,0,0,0,0]]) # rule_example = np.array([[0,0,1,1,1,0,0,0,0],[0,0,1,0,1,0,0,1,1]])
+        self.InitialRule = np.array([[0,0,0,1,0,0,0,0,0],[0,0,1,1,0,0,0,0,0]])
 
         self.arr = np.random.randint(0,high=2, size=(int(self.height/self.mult),int(self.width/self.mult)))
         self.init_pic()
@@ -37,7 +39,7 @@ class GameofLife(Tk.Frame):
         self.parent.grid_rowconfigure(0,weight=0)
         self.parent.grid_columnconfigure(0,weight=0)
 
-        self.parent.grid_columnconfigure(6,weight=1)
+        self.parent.grid_columnconfigure(8,weight=1)
         self.parent.grid_columnconfigure(0,weight=1)
 
         # Create a button and append it  a callback method to clear the image          
@@ -80,10 +82,19 @@ class GameofLife(Tk.Frame):
         self.update_img()
 
         
-    def adjustrule():
-        pass
-            
-    def undo():
+    def adjustrule(self):
+
+        newWindow = RuleWindow(self,self.rule)
+        
+
+        #print("state zero: %d,\state one: %d" % (var1.get(), var2.get()))
+        #Label(master, text="Rule:").grid(row=0, sticky=W)
+        #var1 = Tk.IntVar()
+        #Checkbutton(master, text="Value Zero", variable=var1).grid(row=1, sticky=W, onvalue = 1, offvalue = 0, initialvalue=self.InitialRule[0](1))
+        #var2 = Tk.IntVar()
+        #Checkbutton(master, text="Value One", variable=var2).grid(row=2, sticky=W, onvalue = 1, offvalue = 0, initialvalue=self.InitialRule[1](1))
+
+    def undo(self):
         pass
 
     def callback(self,event):
@@ -123,6 +134,7 @@ class GameofLife(Tk.Frame):
         self.button_reset['state'] = 'disabled'
         self.button_random['state'] = 'disabled' 
         self.button_adjust['state'] = 'disabled'   
+        self.button_rule['state'] = 'disabled'
 
         self.button_run.configure(text = 'Stop', command = self.stopthingy)
 
@@ -134,7 +146,7 @@ class GameofLife(Tk.Frame):
         self.button_reset['state'] = 'normal'
         self.button_random['state'] = 'normal' 
         self.button_adjust['state'] = 'normal'   
-
+        self.button_rule['state'] = 'normal'
 
         self.button_run.configure(text = 'Start', command = self.runthingy)
 
@@ -160,7 +172,6 @@ class GameofLife(Tk.Frame):
 
         self.width = width * self.mult
         self.height = height * self.mult
-
         self.arr = loadedarr.astype(int)
 
         self.clear()
