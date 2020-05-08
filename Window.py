@@ -61,10 +61,17 @@ class GameofLife(Tk.Frame):
         self.button_adjust.grid(row = 1, column =5)
 
         self.button_speed = Tk.Button(self.parent, text = 'Speed', command = self.adjustspeed)
-        self.button_speed.grid(row = 1, column =6,sticky="w")
+        self.button_speed.grid(row = 1, column =6)
+
+        self.button_undo = Tk.Button(self.parent, text = 'Undo', command = self.undo)
+        self.button_undo.grid(row = 1, column =7)
+
+
+        self.button_rule = Tk.Button(self.parent, text = 'Rule', command = self.adjustrule)
+        self.button_rule.grid(row = 1, column =8,sticky="w")
 
         self.canvas = Tk.Canvas(self.parent, width = self.width, height = self.height)
-        self.canvas.grid(row = 0,columnspan = 7)
+        self.canvas.grid(row = 0,columnspan = 9)
 
 
 
@@ -73,8 +80,11 @@ class GameofLife(Tk.Frame):
         self.update_img()
 
         
-
-    
+    def adjustrule():
+        pass
+            
+    def undo():
+        pass
 
     def callback(self,event):
         '''
