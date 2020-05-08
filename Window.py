@@ -5,7 +5,7 @@ import PIL.Image, PIL.ImageTk
 import numpy as np
 import os
 
-from Run import next_step
+from Rules import next_step
 
 class GameofLife(Tk.Frame):
     '''
@@ -23,8 +23,9 @@ class GameofLife(Tk.Frame):
         self.mult = res
 
         self.speed = speed
+        self.rule = np.array([[0,0,1,1,1,0,0,0,0],[0,0,1,0,1,0,0,1,1]])
 
-        self.arr = np.random.randint(0,high=2, size=(int(self.height/self.mult),int(self.width/self.mult))).astype(bool)
+        self.arr = np.random.randint(0,high=2, size=(int(self.height/self.mult),int(self.width/self.mult)))
         self.init_pic()
 
     def init_pic(self):
@@ -91,7 +92,7 @@ class GameofLife(Tk.Frame):
         pixelx = int(y/self.mult)
         pixely = int(x/self.mult)
 
-        self.arr[pixelx,pixely] = not(self.arr[pixelx,pixely])
+        self.arr[pixelx,pixely] = not((self.arr.astype(bool))[pixelx,pixely])
 
 
         self.update_img()
@@ -99,7 +100,7 @@ class GameofLife(Tk.Frame):
         
    
     def update_img(self):
-        self.myphoto = PIL.Image.fromarray(self.arr).resize((self.width,self.height),0)
+        self.myphoto = PIL.Image.fromarray(self.arr.astype(bool)).resize((self.width,self.height),0)
         self.photo = PIL.ImageTk.PhotoImage(image = self.myphoto)
         self.canvas.create_image(0, self.height, image=self.photo, anchor=Tk.SW)
 
@@ -128,17 +129,17 @@ class GameofLife(Tk.Frame):
         self.button_run.configure(text = 'Start', command = self.runthingy)
 
     def evolve(self):
-        self.arr = next_step(self.arr)
+        self.arr = next_step(self.arr,self.rule)
         self.update_img()
         self.cancelid = self.parent.after(self.speed,self.evolve)
 
     def reset(self):
-        self.arr = np.zeros(self.arr.shape).astype(bool)
+        self.arr = np.zeros(self.arr.shape).astype(int)
 
         self.update_img()
 
     def randomize(self):
-        self.arr =np.random.randint(0,high=2, size=(int(self.height/self.mult),int(self.width/self.mult))).astype(bool)
+        self.arr =np.random.randint(0,high=2, size=(int(self.height/self.mult),int(self.width/self.mult)))
         self.update_img()
 
     def open(self):
@@ -150,7 +151,7 @@ class GameofLife(Tk.Frame):
         self.width = width * self.mult
         self.height = height * self.mult
 
-        self.arr = loadedarr.astype(bool)
+        self.arr = loadedarr.astype(int)
 
         self.clear()
         self.init_pic()
@@ -166,7 +167,7 @@ class GameofLife(Tk.Frame):
         print(filename)
         if not filename: return
 
-        np.savetxt(filename,self.arr)
+        np.savetxt(filename,self.arr,fmt=int)
 
     def changesize(self):
         width = Tk.simpledialog.askinteger("Input","Width",initialvalue=400)
@@ -182,7 +183,7 @@ class GameofLife(Tk.Frame):
         self.mult = res
        
         self.clear()
-        self.arr = np.random.randint(0,high=2, size=(int(self.height/self.mult),int(self.width/self.mult))).astype(bool)
+        self.arr = np.random.randint(0,high=2, size=(int(self.height/self.mult),int(self.width/self.mult)))
         self.init_pic() 
 
 
@@ -196,6 +197,6 @@ class GameofLife(Tk.Frame):
 # Main method
 def main(width=400,height=400,res=10,speed=1000):
     root=Tk.Tk()
-    GameofLife(root,width,height,res)
+    GameofLife(root,width,height,res,speed)
     root.mainloop()
 
