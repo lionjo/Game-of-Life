@@ -27,17 +27,59 @@ def calc_neighbours(array,rule):
     Applies a given rule to an array
     Implies periodic boundary conditions
     """
-    n1 = np.roll(array,1,axis=0)
-    n2 = np.roll(array,-1,axis=0)
-    n3 = np.roll(array,1,axis=0)
-    n4 = np.roll(array,-1,axis=0)
-    n5 = np.roll(array,1,axis=1)
-    n6 = np.roll(array,-1,axis=1)
-    n7 = np.roll(array,1,axis=1)
-    n8 = np.roll(array,-1,axis=1)
+    states, noneigh = np.shape(rule)
 
-    'This is a bit static but leave it for now'
-    return n1+n2+n3+n4+n5+n6+n7+n8
+    if(states != 2):
+        print("Rule has more states than we can handle right now. Adjust rule.")
+
+    if(noneigh == 5):
+        result = np.roll(array,1,axis=0) + np.roll(array,-1,axis=0) +\
+                np.roll(array,1,axis=1) + np.roll(array,-1,axis=1)
+
+    elif(noneigh == 9):
+        result = np.roll(array,1,axis=0) + np.roll(array,-1,axis=0) +\
+                 np.roll(array,1,axis=1) + np.roll(array,-1,axis=1) +\
+                 np.roll(np.roll(array,1,axis=1),1,axis=0) + \
+                 np.roll(np.roll(array,-1,axis=1),1,axis=0) + \
+                 np.roll(np.roll(array,1,axis=1),-1,axis=0) + \
+                 np.roll(np.roll(array,-1,axis=1),-1,axis=0) 
+
+    elif(noneigh == 13):
+        result = np.roll(array,1,axis=0) + np.roll(array,-1,axis=0) +\
+                 np.roll(array,1,axis=1) + np.roll(array,-1,axis=1) +\
+                 np.roll(np.roll(array,1,axis=1),1,axis=0) + \
+                 np.roll(np.roll(array,-1,axis=1),1,axis=0) + \
+                 np.roll(np.roll(array,1,axis=1),-1,axis=0) + \
+                 np.roll(np.roll(array,-1,axis=1),-1,axis=0) + \
+                 np.roll(array,2,axis=0) + np.roll(array,-2,axis=0) +\
+                 np.roll(array,2,axis=1) + np.roll(array,-2,axis=1)
+
+
+    elif(noneigh == 25):
+        result = np.roll(array,1,axis=0) + np.roll(array,-1,axis=0) +\
+                 np.roll(array,1,axis=1) + np.roll(array,-1,axis=1) +\
+                 np.roll(np.roll(array,1,axis=1),1,axis=0) + \
+                 np.roll(np.roll(array,-1,axis=1),1,axis=0) + \
+                 np.roll(np.roll(array,1,axis=1),-1,axis=0) + \
+                 np.roll(np.roll(array,-1,axis=1),-1,axis=0) + \
+                 np.roll(array,2,axis=0) + np.roll(array,-2,axis=0) +\
+                 np.roll(array,2,axis=1) + np.roll(array,-2,axis=1) +\
+                 np.roll(np.roll(array,2,axis=1),1,axis=0) + \
+                 np.roll(np.roll(array,-2,axis=1),1,axis=0) + \
+                 np.roll(np.roll(array,2,axis=1),-1,axis=0) + \
+                 np.roll(np.roll(array,-2,axis=1),-1,axis=0) + \
+                 np.roll(np.roll(array,1,axis=1),2,axis=0) + \
+                 np.roll(np.roll(array,-1,axis=1),2,axis=0) + \
+                 np.roll(np.roll(array,1,axis=1),-2,axis=0) + \
+                 np.roll(np.roll(array,-1,axis=1),-2,axis=0) + \
+                 np.roll(np.roll(array,2,axis=1),2,axis=0) + \
+                 np.roll(np.roll(array,-2,axis=1),2,axis=0) + \
+                 np.roll(np.roll(array,2,axis=1),-2,axis=0) + \
+                 np.roll(np.roll(array,-2,axis=1),-2,axis=0)
+    else:
+        print("Rule has unhandable neighbours:", noneigh)
+
+    return result
 
 
 def next_step(array,rule):

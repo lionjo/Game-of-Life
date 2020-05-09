@@ -24,10 +24,16 @@ class GameofLife(Tk.Frame):
         self.mult = res
 
         self.speed = speed
-        self.rule = np.array([[0,0,0,1,0,0,0,0,0],[0,0,1,1,0,0,0,0,0]]) # rule_example = np.array([[0,0,1,1,1,0,0,0,0],[0,0,1,0,1,0,0,1,1]])
-        self.InitialRule = np.array([[0,0,0,1,0,0,0,0,0],[0,0,1,1,0,0,0,0,0]])
+        #self.rule = np.array([[0,0,0,1,0,0,0,0,0],[0,0,1,1,0,0,0,0,0]]) # rule_example = np.array([[0,0,1,1,1,0,0,0,0],[0,0,1,0,1,0,0,1,1]])
+        #self.InitialRule = np.array([[0,0,0,1,0,0,0,0,0],[0,0,1,1,0,0,0,0,0]])
 
-        self.arr = np.random.randint(0,high=2, size=(int(self.height/self.mult),int(self.width/self.mult)))
+        self.rule = np.array([[0,0,0,1,0,0,0,0,0],[0,0,1,1,0,0,0,0,0]])
+        #self.arr = np.random.randint(0,high=2, size=(int(self.height/self.mult),int(self.width/self.mult)))
+        
+        self.arr = np.zeros((int(self.height/self.mult),int(self.width/self.mult)),dtype=int)
+        self.initarr = self.arr
+        self.initbool = True
+
         self.init_pic()
 
     def init_pic(self):
@@ -95,7 +101,9 @@ class GameofLife(Tk.Frame):
         #Checkbutton(master, text="Value One", variable=var2).grid(row=2, sticky=W, onvalue = 1, offvalue = 0, initialvalue=self.InitialRule[1](1))
 
     def undo(self):
-        pass
+        self.initbool = True
+        self.arr = self.initarr
+        self.update_img()
 
     def callback(self,event):
         '''
@@ -127,6 +135,11 @@ class GameofLife(Tk.Frame):
 
 
     def runthingy(self):
+
+        if self.initbool:
+            self.initarr = self.arr
+            self.initbool = False
+
         self.evolve()
 
         self.button_open['state'] = 'disabled'
@@ -134,7 +147,8 @@ class GameofLife(Tk.Frame):
         self.button_reset['state'] = 'disabled'
         self.button_random['state'] = 'disabled' 
         self.button_adjust['state'] = 'disabled'   
-        self.button_rule['state'] = 'disabled'
+        #self.button_rule['state'] = 'disabled'
+        self.button_undo['state'] = 'disabled'
 
         self.button_run.configure(text = 'Stop', command = self.stopthingy)
 
@@ -146,7 +160,8 @@ class GameofLife(Tk.Frame):
         self.button_reset['state'] = 'normal'
         self.button_random['state'] = 'normal' 
         self.button_adjust['state'] = 'normal'   
-        self.button_rule['state'] = 'normal'
+        #self.button_rule['state'] = 'normal'
+        self.button_undo['state'] = 'normal'
 
         self.button_run.configure(text = 'Start', command = self.runthingy)
 
@@ -156,6 +171,7 @@ class GameofLife(Tk.Frame):
         self.cancelid = self.parent.after(self.speed,self.evolve)
 
     def reset(self):
+        self.initbool = True
         self.arr = np.zeros(self.arr.shape).astype(int)
 
         self.update_img()
@@ -188,7 +204,7 @@ class GameofLife(Tk.Frame):
         print(filename)
         if not filename: return
 
-        np.savetxt(filename,self.arr,fmt=int)
+        np.savetxt(filename,self.arr)
 
     def changesize(self):
         width = Tk.simpledialog.askinteger("Input","Width",initialvalue=400)
@@ -204,7 +220,7 @@ class GameofLife(Tk.Frame):
         self.mult = res
        
         self.clear()
-        self.arr = np.random.randint(0,high=2, size=(int(self.height/self.mult),int(self.width/self.mult)))
+        self.arr = np.zeros((int(self.height/self.mult),int(self.width/self.mult)),dtype =int)
         self.init_pic() 
 
 

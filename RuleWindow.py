@@ -27,8 +27,9 @@ class RuleWindow(Tk.Frame):
         """
         self.window.title("Set the rule") 
 
-        self.window.grid_rowconfigure(0,weight=0)
-        self.window.grid_columnconfigure(0,weight=0)
+        #self.window.grid_rowconfigure(0,weight=0)
+        #self.window.grid_columnconfigure(0,weight=0)
+        #self.window.grid_columnconfigure(self.rulewidth+1,weight=2)
 
         #self.window.grid_columnconfigure(self.rulewidth,weight=1)
         #self.window.grid_columnconfigure(0,weight=1)
@@ -39,25 +40,87 @@ class RuleWindow(Tk.Frame):
         labels = []
         for i in range(0,self.rulewidth):
             labels.append(Tk.Label(self.window,text = str(i)))
-            labels[-1].grid(row = 0, column = i)
+            labels[-1].grid(row = 0, column = i+1,sticky = "nesw")
 
 
         self.window.canvas = Tk.Canvas(self.window, width = self.width, height = self.height)
         self.window.canvas.grid(row = 1,column = 1,columnspan = self.rulewidth, rowspan = self.ruleheight)
 
+        self.buttonless = Tk.Button(self.window, text = 'Less', command = self.lessneighbours)
+        self.buttonless.grid(row = 2, column =self.rulewidth+1,sticky = "nesw")
+
+        self.buttonmore = Tk.Button(self.window, text = 'More', command = self.moreneighbours)
+        self.buttonmore.grid(row = 1, column =self.rulewidth+1,sticky = "nesw")
+
+
         labelsh = []
         # Append a nonlabel
         labelsh.append(Tk.Label(self.window,text = None))
-        labelsh[-1].grid(row = 0, column = 0)
+        labelsh[-1].grid(row = 0, column = 0,sticky = "nesw")
+
+        #labelsh.append(Tk.Label(self.window,text = None))
+        #labelsh[-1].grid(row = 0,column =self.rulewidth+1)
 
         labelsh = []
         for i in range(0,self.ruleheight):
             labelsh.append(Tk.Label(self.window,text = str(i)))
-            labelsh[-1].grid(row = i+1, column = 0)
+            labelsh[-1].grid(row = i+1, column = 0,sticky = "nesw")
 
 
         self.window.canvas.bind("<Button-1>", self.callback)    
         self.update_img()
+
+    def moreneighbours(self):
+        if(self.rulewidth == 5):
+            self.parent.rule = np.zeros((2,9),dtype = int)
+            self.rule = self.parent.rule
+        elif(self.rulewidth == 9):
+            self.parent.rule = np.zeros((2,13),dtype = int)
+            self.rule = self.parent.rule
+        elif(self.rulewidth == 13):
+            self.parent.rule = np.zeros((2,25),dtype = int)
+            self.rule = self.parent.rule
+        elif(self.rulewidth == 25):
+            self.parent.rule = np.zeros((2,25),dtype = int)
+            self.rule = self.parent.rule
+        else:
+            print("Invlaid Rulewidth:",self.rulewidth)
+            return
+
+        self.ruleheight, self.rulewidth = np.shape(self.rule)
+        self.width = self.rulewidth*self.mult
+        self.height = self.ruleheight*self.mult
+
+        self.clear()
+        self.init_rule()
+
+    def lessneighbours(self):
+        """
+        The list of implemented rules are length: 5,9,13,25
+        """
+        if(self.rulewidth == 5):
+            self.parent.rule = np.zeros((2,5),dtype = int)
+            self.rule = self.parent.rule
+        elif(self.rulewidth == 9):
+            self.parent.rule = np.zeros((2,5),dtype = int)
+            self.rule = self.parent.rule
+        elif(self.rulewidth == 13):
+            self.parent.rule = np.zeros((2,9),dtype = int)
+            self.rule = self.parent.rule
+        elif(self.rulewidth == 25):
+            self.parent.rule = np.zeros((2,13),dtype = int)
+            self.rule = self.parent.rule
+        else:
+            print("Invlaid Rulewidth:",self.rulewidth)
+            return
+
+        self.ruleheight, self.rulewidth = np.shape(self.rule)
+        self.width = self.rulewidth*self.mult
+        self.height = self.ruleheight*self.mult
+
+        self.clear()
+        self.init_rule()
+
 
 
     def update_img(self):
@@ -85,3 +148,8 @@ class RuleWindow(Tk.Frame):
 
 
         self.update_img()
+
+    def clear(self):
+        list = self.window.grid_slaves()
+        for l in list:
+            l.destroy()
