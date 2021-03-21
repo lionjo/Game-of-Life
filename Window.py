@@ -5,6 +5,7 @@ import PIL.Image, PIL.ImageTk
 import numpy as np
 import os
 
+from RuleFinder import DECfromrule,arrsampler
 from Rules import next_step
 from RuleWindow import RuleWindow
 
@@ -40,7 +41,7 @@ class GameofLife(Tk.Frame):
         """
         Draw the GUI
         """
-        self.parent.title("Our Game of Life")       
+        self.parent.title("Our Game of Life. Rule: "+str(DECfromrule(self.rule)))       
         
         self.parent.grid_rowconfigure(0,weight=0)
         self.parent.grid_columnconfigure(0,weight=0)
@@ -145,7 +146,7 @@ class GameofLife(Tk.Frame):
         self.button_open['state'] = 'disabled'
         self.button_save['state'] = 'disabled'
         self.button_reset['state'] = 'disabled'
-        self.button_random['state'] = 'disabled' 
+        #self.button_random['state'] = 'disabled' 
         self.button_adjust['state'] = 'disabled'   
         #self.button_rule['state'] = 'disabled'
         self.button_undo['state'] = 'disabled'
@@ -158,7 +159,7 @@ class GameofLife(Tk.Frame):
         self.button_open['state'] = 'normal'
         self.button_save['state'] = 'normal'
         self.button_reset['state'] = 'normal'
-        self.button_random['state'] = 'normal' 
+        #self.button_random['state'] = 'normal' 
         self.button_adjust['state'] = 'normal'   
         #self.button_rule['state'] = 'normal'
         self.button_undo['state'] = 'normal'
@@ -174,10 +175,12 @@ class GameofLife(Tk.Frame):
         self.initbool = True
         self.arr = np.zeros(self.arr.shape).astype(int)
 
+        self.clear()
+        self.init_pic()
         self.update_img()
 
     def randomize(self):
-        self.arr =np.random.randint(0,high=2, size=(int(self.height/self.mult),int(self.width/self.mult)))
+        self.arr = arrsampler(int(self.height/self.mult),int(self.width/self.mult),2)
         self.update_img()
 
     def open(self):
@@ -204,7 +207,7 @@ class GameofLife(Tk.Frame):
         print(filename)
         if not filename: return
 
-        np.savetxt(filename,self.arr)
+        np.savetxt(filename,self.arr,fmt = '%i')
 
     def changesize(self):
         width = Tk.simpledialog.askinteger("Input","Width",initialvalue=400)

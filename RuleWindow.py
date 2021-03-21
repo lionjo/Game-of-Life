@@ -52,6 +52,8 @@ class RuleWindow(Tk.Frame):
         self.buttonmore = Tk.Button(self.window, text = 'More', command = self.moreneighbours)
         self.buttonmore.grid(row = 1, column =self.rulewidth+1,sticky = "nesw")
 
+        self.buttonless = Tk.Button(self.window, text = 'Enter', command = self.enterfromDEC)
+        self.buttonless.grid(row = 0, column =self.rulewidth+1,sticky = "nesw")
 
         labelsh = []
         # Append a nonlabel
@@ -70,8 +72,23 @@ class RuleWindow(Tk.Frame):
         self.window.canvas.bind("<Button-1>", self.callback)    
         self.update_img()
 
+    def enterfromDEC(self):
+        DEC = Tk.simpledialog.askinteger("Rule from Decimal","DEC",initialvalue=1)
+        
+        self.rule = np.flip(np.transpose(np.reshape(np.array(list(np.binary_repr(DEC-1, width = 2*self.rulewidth))),(self.rulewidth,2)))).astype(int)
+        self.parent.rule = self.rule
+        self.ruleheight, self.rulewidth = np.shape(self.rule)
+        self.width = self.rulewidth*self.mult
+        self.height = self.ruleheight*self.mult
+
+        self.clear()
+        self.init_rule()
+
     def moreneighbours(self):
         if(self.rulewidth == 5):
+            self.parent.rule = np.zeros((2,7),dtype = int)
+            self.rule = self.parent.rule
+        elif(self.rulewidth == 7):
             self.parent.rule = np.zeros((2,9),dtype = int)
             self.rule = self.parent.rule
         elif(self.rulewidth == 9):
@@ -101,8 +118,11 @@ class RuleWindow(Tk.Frame):
         if(self.rulewidth == 5):
             self.parent.rule = np.zeros((2,5),dtype = int)
             self.rule = self.parent.rule
-        elif(self.rulewidth == 9):
+        elif(self.rulewidth == 7):
             self.parent.rule = np.zeros((2,5),dtype = int)
+            self.rule = self.parent.rule
+        elif(self.rulewidth == 9):
+            self.parent.rule = np.zeros((2,7),dtype = int)
             self.rule = self.parent.rule
         elif(self.rulewidth == 13):
             self.parent.rule = np.zeros((2,9),dtype = int)

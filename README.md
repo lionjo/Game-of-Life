@@ -1,6 +1,7 @@
 # OurGameofLife
-Blablabla
 
-hahaha my change
+
+## Rules
+
 
 

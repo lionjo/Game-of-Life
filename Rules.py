@@ -36,7 +36,16 @@ def calc_neighbours(array,rule):
         result = np.roll(array,1,axis=0) + np.roll(array,-1,axis=0) +\
                 np.roll(array,1,axis=1) + np.roll(array,-1,axis=1)
 
+    elif(noneigh == 7):
+        # Hexagonal Neighbourhood
+        result = np.roll(array,1,axis=0) + np.roll(array,-1,axis=0) +\
+                 np.roll(array,1,axis=1) + np.roll(array,-1,axis=1) +\
+                 np.roll(np.roll(array,1,axis=1),1,axis=0) + \
+                 np.roll(np.roll(array,-1,axis=1),-1,axis=0) 
+
+
     elif(noneigh == 9):
+        # Moore Neighbourhood
         result = np.roll(array,1,axis=0) + np.roll(array,-1,axis=0) +\
                  np.roll(array,1,axis=1) + np.roll(array,-1,axis=1) +\
                  np.roll(np.roll(array,1,axis=1),1,axis=0) + \
@@ -90,4 +99,15 @@ def next_step(array,rule):
     neighbours = calc_neighbours(array,rule)
     result = apply_rule(array,neighbours,rule)
     return result
+
+
+
+def evolve_array(array,rule,nsteps):
+    """
+    takes in an integer array
+    """
+    newarray = np.zeros((nsteps,np.shape(array)[0],np.shape(array)[1]))
+    for i in range(0,nsteps):
+        newarray[i] = next_step(array,rule)
+    return newarray
 
