@@ -88,7 +88,13 @@ class GameofLife(Tk.Frame):
 
         self.update_img()
 
-        
+    def update_title_rule(self):
+        """
+        Updates the Rule description in the title.
+        """
+        self.parent.title("Our Game of Life. Rule: "+str(DECfromrule(self.rule)))
+        self.update_img()   
+
     def adjustrule(self):
 
         newWindow = RuleWindow(self,self.rule)
@@ -123,8 +129,8 @@ class GameofLife(Tk.Frame):
         pixely = int(x/self.mult)
 
         self.arr[pixelx,pixely] = not((self.arr.astype(bool))[pixelx,pixely])
-
-
+        self.clear()
+        self.init_pic()
         self.update_img()
 
         
@@ -172,6 +178,7 @@ class GameofLife(Tk.Frame):
         self.cancelid = self.parent.after(self.speed,self.evolve)
 
     def reset(self):
+        self.stopthingy()
         self.initbool = True
         self.arr = np.zeros(self.arr.shape).astype(int)
 

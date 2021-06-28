@@ -108,8 +108,6 @@ class RuleWindow(Tk.Frame):
         self.width = self.rulewidth*self.mult
         self.height = self.ruleheight*self.mult
 
-        self.clear()
-        self.init_rule()
 
     def lessneighbours(self):
         """
@@ -138,8 +136,7 @@ class RuleWindow(Tk.Frame):
         self.width = self.rulewidth*self.mult
         self.height = self.ruleheight*self.mult
 
-        self.clear()
-        self.init_rule()
+
 
 
 
@@ -156,6 +153,9 @@ class RuleWindow(Tk.Frame):
         self.parent.focus_set()
 
         self.adjust_image(event.x,event.y)
+        self.parent.update_title_rule()
+        self.clear()
+        self.init_rule()
 
     def adjust_image(self,x,y):
         '''
