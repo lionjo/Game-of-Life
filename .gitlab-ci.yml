@@ -1,0 +1,25 @@
+stages:
+  - test
+
+variables:
+  GIT_SUBMODULE_STRATEGY: recursive
+
+# add 'node_modules' to cache for speeding up builds
+cache:
+  paths:
+    - node_modules/ # Node modules and dependencies
+    - opt/conda/
+
+test:python:
+  stage: test
+  image: continuumio/miniconda3:latest
+  before_script:
+      - conda init
+      - conda install python
+      - pip install -e .     
+      - pre-commit install
+  script:
+    - pre-commit run -a 
+    - python -m unittest discover -s tests -p 'test*.py'
+  only:
+    - master
