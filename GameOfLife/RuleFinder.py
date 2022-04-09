@@ -2,12 +2,18 @@ import numpy as np
 
 
 def saverule(rules, filename):
+    """
+    Saves the rule to a file
+    """
     ruleshape = np.shape(rules)
 
     np.savetxt(filename, np.reshape(rules, (ruleshape[0], ruleshape[1] * ruleshape[2])), fmt="%i")
 
 
 def loadrules(filename):
+    """
+    Loads a rule from a txt file.
+    """
     rules = np.loadtxt(filename)
 
     norules, leng = rules.shape
@@ -67,17 +73,15 @@ def arrsampler(width, height, sparseness):
     return arr
 
 
-"""
-print(arrsampler(10,10,40))
+if __name__ == "__main__":
 
-print(rulesampler_array(5,10).shape)
+    print(arrsampler(10, 10, 40))
 
-saverule(rulesampler_array(5,100),"ruletest.txt")
+    print(rulesampler_array(5, 10).shape)
 
-print(loadrules("ruletest.txt"))
+    saverule(rulesampler_array(5, 100), "ruletest.txt")
 
+    print(loadrules("ruletest.txt"))
 
-print(rulefromDEC(1024,5))
-print(DECfromrule(rulefromDEC(1008,5)))
-
-"""
+    print(rulefromDEC(1024, 5))
+    print(DECfromrule(rulefromDEC(1008, 5)))

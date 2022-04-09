@@ -9,7 +9,7 @@ setup(
     author_email="jorrit.lion@gmail.com",
     license="MIT",
     packages=find_packages() + find_namespace_packages(),
-    install_requires=["numpy", "matplotlib"],
+    install_requires=["numpy", "Pillow"],
     scripts=["scripts/GameOfLife.py"],
     python_requires=">=3.6.*",
     zip_safe=False,
