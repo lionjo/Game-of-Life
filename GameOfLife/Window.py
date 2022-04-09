@@ -51,7 +51,7 @@ class GameOfLife(Tk.Frame):
         self.parent.grid_rowconfigure(0, weight=0)
         self.parent.grid_columnconfigure(0, weight=0)
 
-        self.parent.grid_columnconfigure(10, weight=1)
+        self.parent.grid_columnconfigure(11, weight=1)
         self.parent.grid_columnconfigure(0, weight=1)
 
         # Create a button and append it  a callback method to clear the image
@@ -70,26 +70,29 @@ class GameOfLife(Tk.Frame):
         self.button_save_png = Tk.Button(self.parent, text="Save Png", command=self.save_img_as_png)
         self.button_save_png.grid(row=1, column=4)
 
+        self.button_save_gif = Tk.Button(self.parent, text="Save Gif", command=self.save_gif)
+        self.button_save_gif.grid(row=1, column=5)
+
         self.button_save = Tk.Button(self.parent, text="Save", command=self.save)
-        self.button_save.grid(row=1, column=5)
+        self.button_save.grid(row=1, column=6)
 
         self.button_open = Tk.Button(self.parent, text="Open", command=self.open)
-        self.button_open.grid(row=1, column=6)
+        self.button_open.grid(row=1, column=7)
 
         self.button_adjust = Tk.Button(self.parent, text="Size", command=self.changesize)
-        self.button_adjust.grid(row=1, column=7)
+        self.button_adjust.grid(row=1, column=8)
 
         self.button_speed = Tk.Button(self.parent, text="Speed", command=self.adjustspeed)
-        self.button_speed.grid(row=1, column=8)
+        self.button_speed.grid(row=1, column=9)
 
         self.button_undo = Tk.Button(self.parent, text="Undo", command=self.undo)
-        self.button_undo.grid(row=1, column=9)
+        self.button_undo.grid(row=1, column=10)
 
         self.button_rule = Tk.Button(self.parent, text="Rule", command=self.adjustrule)
-        self.button_rule.grid(row=1, column=10, sticky="w")
+        self.button_rule.grid(row=1, column=11, sticky="w")
 
         self.canvas = Tk.Canvas(self.parent, width=self.width, height=self.height)
-        self.canvas.grid(row=0, columnspan=11)
+        self.canvas.grid(row=0, columnspan=12)
 
         self.canvas.bind("<Button-1>", self.callback)
 
@@ -135,13 +138,53 @@ class GameOfLife(Tk.Frame):
 
         self.update_img()
 
+    def get_PIL_Image(self, array):
+        """
+        Returns an PIL from the current array
+        """
+        from PIL import ImageDraw
+
+        myphoto = (
+            PIL.Image.fromarray(np.invert(array.astype(bool)))
+            .resize((self.width, self.height), 0)
+            .convert("P")
+        )
+
+        # This draws the grid
+        step_size = self.mult
+        # Draw some lines
+        draw = ImageDraw.Draw(myphoto)
+        y_start = 0
+        y_end = myphoto.height
+
+        for x in range(0, myphoto.width, step_size):
+            line = ((x, y_start), (x, y_end))
+            draw.line(line, fill=128)
+        x_start = 0
+        x_end = myphoto.width
+        for y in range(0, myphoto.height, step_size):
+            line = ((x_start, y), (x_end, y))
+            draw.line(line, fill=128)
+        del draw
+        return myphoto
+
+    def get_PIL_Image_Sequence(self, reachback=4):
+        """
+        Returns an PIL from the current array
+        """
+        imagelist = []
+        # goes either until periodic state is reached or until the given depth
+        for i in range(0, min([self.grid.periodicity, reachback, len(self.grid.lastarrays)]) + 1):
+            imagelist.append(self.get_PIL_Image(self.grid.lastarrays[-i]))
+
+        return imagelist
+
     def update_img(self):
         """
         Updates the canvas to a new image
         """
-        self.myphoto = PIL.Image.fromarray(self.grid.array.astype(bool)).resize(
-            (self.width, self.height), 0
-        )
+        self.myphoto = self.get_PIL_Image(self.grid.array)
+
         self.photo = PIL.ImageTk.PhotoImage(image=self.myphoto)
         self.canvas.create_image(0, self.height, image=self.photo, anchor=Tk.SW)
 
@@ -161,6 +204,36 @@ class GameOfLife(Tk.Frame):
             return
 
         self.myphoto.save(filename)
+
+    def save_gif(self):
+        """
+        Saves the current array as png file
+        """
+        filename = Tk.filedialog.asksaveasfilename(
+            initialdir=os.getcwd(),
+            filetypes=[("Gif Files", "*.gif")],
+            defaultextension=".gif",
+            initialfile="output.gif",
+        )
+
+        print(filename)
+        if not filename:
+            return
+
+        imagelist = self.get_PIL_Image_Sequence(reachback=60)[::-1]  # reverses the list
+
+        if len(imagelist) > 1:
+            imagelist[0].save(
+                fp=filename,
+                format="GIF",
+                save_all=True,
+                append_images=imagelist[1:],
+                optimize=True,
+                loop=0,
+            )
+        else:
+            print("List not greater than 1! Saving it as .png")
+            imagelist[0].save(filename)
 
     def step(self):
         """
@@ -233,6 +306,7 @@ class GameOfLife(Tk.Frame):
         Initializes with random start values
         """
         self.grid.randomize(sparseness)
+        self.initbool = True
         self.update_img()
 
     def open(self):

@@ -1,6 +1,6 @@
 # OurGameOfLife
 
-`OurGameOfLife` is a `numpy` based generalized implementation of [Convey's Game of Life]().
+`OurGameOfLife` is a `numpy` based generalized implementation of [Convey's Game of Life](https://en.wikipedia.org/wiki/Conway%27s_Game_of_Life).
 
 ## Install
 

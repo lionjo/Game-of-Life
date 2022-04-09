@@ -15,6 +15,14 @@ class Grid:
         self.array = np.zeros((int(self.height), int(self.width)), dtype=int)
         self.neighbouring_array = self.array * 0
 
+        self.memory = 100  # Sets how far back the grid memorizes the position
+        self.periodicity = (
+            np.inf
+        )  # This sets how repetitive the current state is. If = 0 it is still
+
+        # These are the last n arrays (used to find periodic patterns)
+        self.lastarrays = [self.array]
+
         if ruleDEC is not None:
             self.Rule = Rule.from_DEC(ruleDEC, no_neigh)
         else:
@@ -66,11 +74,45 @@ class Grid:
         self.calc_neighbours()
 
         if set_self:
+            self.lastarrays[-1] = self.array
             self.array = self.apply_rule()
+
+            self.lastarrays.append(self.array)
+
+            self.limit_lastarrays()
+            self.check_periodicity()
+
             return self.array
         else:
             array = self.apply_rule()
             return array
+
+    def reset_lastarrays():
+        """
+        Resets the lastarray to the current state
+        """
+
+    def limit_lastarrays(self):
+        """
+        Limits lastarrays to a given size, set by self.memory
+        """
+        if len(self.lastarrays) > self.memory:
+            self.lastarrays = self.lastarrays[-self.memory :]
+
+    def check_periodicity(self):
+        """
+        Checks if lastarraylist is periodic
+        """
+        # inverse array first (start from the back)
+        array_A = self.lastarrays[-1]
+
+        for i, array_B in enumerate(reversed(self.lastarrays[:-1])):
+            if np.all(array_A == array_B):
+                # periodic!
+                print("Periodic state found! Periodicity: ", i)
+                self.lastarrays = self.lastarrays[-(i + 1) :]
+                self.periodicity = i
+                return i
 
     def multiple_steps(self, nsteps, set_self=True):
         """

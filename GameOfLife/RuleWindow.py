@@ -141,9 +141,29 @@ class RuleWindow(Tk.Frame):
         """
         Usual update function to update the canvas
         """
-        self.myphoto = PIL.Image.fromarray(self.rule.rule_array.astype(bool)).resize(
+        from PIL import ImageDraw
+
+        self.myphoto = PIL.Image.fromarray(np.invert(self.rule.rule_array.astype(bool))).resize(
             (self.width, self.height), 0
         )
+
+        # This draws the grid
+        step_size = self.mult
+        # Draw some lines
+        draw = ImageDraw.Draw(self.myphoto)
+        y_start = 0
+        y_end = self.myphoto.height
+
+        for x in range(step_size, self.myphoto.width, step_size):
+            line = ((x, y_start), (x, y_end))
+            draw.line(line, fill=128)
+        x_start = 0
+        x_end = self.myphoto.width
+        for y in range(step_size, self.myphoto.height, step_size):
+            line = ((x_start, y), (x_end, y))
+            draw.line(line, fill=128)
+        del draw
+
         self.photo = PIL.ImageTk.PhotoImage(image=self.myphoto)
         self.window.canvas.create_image(0, self.height, image=self.photo, anchor=Tk.SW)
 
