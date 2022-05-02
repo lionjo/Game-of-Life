@@ -14,8 +14,8 @@ Then install using pip:
 pip install -e .
 ```
 A Main window can be opened by running the `main.py` script in `Applications`.
-Or by just typing `GameOfLife` in your terminal (this uses the script in `scripts/`).
-
+Or by just typing `OurGameOfLife.py` in your terminal (this uses the script in `scripts/`).
+Also look through the other files in `Applications`!
 ## The "world"
 
 The world is a 2D map of two possible states, `alive`, represented by `1` or `white`, and `dead`, represented by `0` or `black`.
