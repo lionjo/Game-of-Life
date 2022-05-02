@@ -52,9 +52,10 @@ rule = [[0, 0, 0, 1, 0, 0, 0, 0, 0],
         [0, 0, 1, 1, 0, 0, 0, 0, 0]]
 ```
 
-
-
-Every of such rules can also be written more compactly,
+Every of such rules can also be written more compactly, by associating every rule with a number.
+Just write every rule as a binary number, by flattening it out (and apply some flipping):
+e.g. the rule we defined earlier can be written as `000000000011100000`.
+This is a binary number and can be transferred to `224` -- the unique identifier for Conveys game of life (imposing the 8 field neighbourhood).
 
 
 ## The algorithm
@@ -99,7 +100,16 @@ The rest of the package is GUI.
 
 ## Examples
 
+For the 'usual' set of rules, rule 224, aka Convey's Game of Life, there are many known stable figures, e.g. blinkers (left) and gliders (right):
+
 ![](statics/blinker.gif) ![](statics/spaceship.gif)
+
+But did you know that there are similar figures for other rules too? Here is an example glider in rule 736:
+
+![](statics/glider_736.gif)
+
+Considering that there are $2^{18}$ different possible rules in [Moores' neighbourhood](https://en.wikipedia.org/wiki/Moore_neighborhood), and $2^{49}$ different initial conditions in a $7\times7$ cell window (just as an example), makes finding interesting patterns a very difficult and interesting challenge.
+A brute force algorithm would need to investigate $1.47\cdot  10^{20}$ different situations!
 
 ## Timing
 
@@ -130,4 +140,10 @@ CellularAutomaton["GameOfLife", RandomInteger[1, {500, 500}], {{{3000}}}]
 ```
 Which takes 13 s to evaluate on (the same) 1.8 GHz CPU.
 
-Enabling periodicity, `check_periodicity=True`, checks slows the times down.
+Enabling periodicity checks, `check_periodicity=True`, which is required to find periodic patterns, slows the times down.
+
+### Thank you!
+
+Thank you for reading this far!
+If you like the package and find it useful please consider starring :star: the project.
+If not, let me know what you are missing, via an issue or via DM.

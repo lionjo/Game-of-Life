@@ -76,6 +76,7 @@ class RuleWindow(Tk.Frame):
         self.width = self.rulewidth * self.mult
         self.height = self.ruleheight * self.mult
 
+        self.parent.update_title_rule()
         self.clear()
         self.init_rule()
 

@@ -27,7 +27,6 @@ class Rule:
         Returns the a number to the current rule
         """
         string = "".join(map(str, np.transpose(np.flip(self.rule_array)).flatten()))
-        # print("String: ",string)
         return int(string, 2)
 
     def rulefromDEC(self, number, noneigh=9):
