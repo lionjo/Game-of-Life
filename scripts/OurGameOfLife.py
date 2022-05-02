@@ -1,4 +1,4 @@
-# python
+#! python
 
 from GameOfLife.Window import main
 
