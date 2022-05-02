@@ -54,7 +54,7 @@ rule = [[0, 0, 0, 1, 0, 0, 0, 0, 0],
 
 
 
-Every of such rules
+Every of such rules can also be written more compactly,
 
 
 ## The algorithm
@@ -96,3 +96,38 @@ When accessing an array, here `rule`, by two matrices, `array` and `no_neighbour
 
 These three lines of code are enough to implement a general version of conveys game of life for arbitrary rules.
 The rest of the package is GUI.
+
+## Examples
+
+![](statics/blinker.gif) ![](statics/spaceship.gif)
+
+## Timing
+
+The pure computational part of the package can be called like this. Note the `check_periodicity=False`.
+```python
+grid = Grid(ruleDEC=225)
+grid.randomize()
+grid.multiple_steps(no_steps,check_periodicity=False)
+```
+
+For a single CPU, these are the run-times in wall clock time:
+
+| # steps (100x100 Size) | time [s] |
+|--|--|
+| 1000| 0.25|
+| 5000| 1.25|
+| 10000| 5.47|
+
+| # Gridsize (3000 steps) | time [s] |
+|--|--|
+| 100x100| 0.91|
+| 300x300| 6.51|
+| 500x500| 25.9|
+
+These times are about 2 times slower than `Mathematicas` Cellular Automata implementations:
+```
+CellularAutomaton["GameOfLife", RandomInteger[1, {500, 500}], {{{3000}}}]
+```
+Which takes 13 s to evaluate on (the same) 1.8 GHz CPU.
+
+Enabling periodicity, `check_periodicity=True`, checks slows the times down.

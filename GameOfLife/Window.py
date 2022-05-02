@@ -1,6 +1,6 @@
 import os
 import tkinter as Tk
-import tkinter.filedialog  # These seem to be unused but they are not!
+import tkinter.filedialog  # These seem to be unused but they are not! So don't remove them
 import tkinter.simpledialog
 
 import numpy as np
@@ -157,13 +157,19 @@ class GameOfLife(Tk.Frame):
         y_start = 0
         y_end = myphoto.height
 
-        for x in range(0, myphoto.width, step_size):
-            line = ((x, y_start), (x, y_end))
+        for x in range(0, myphoto.width + step_size, step_size):
+            if x == myphoto.width:
+                line = ((x - 1, y_start), (x - 1, y_end))
+            else:
+                line = ((x, y_start), (x, y_end))
             draw.line(line, fill=128)
         x_start = 0
         x_end = myphoto.width
-        for y in range(0, myphoto.height, step_size):
-            line = ((x_start, y), (x_end, y))
+        for y in range(0, myphoto.height + step_size, step_size):
+            if y == myphoto.height:
+                line = ((x_start, y - 1), (x_end, y - 1))
+            else:
+                line = ((x_start, y), (x_end, y))
             draw.line(line, fill=128)
         del draw
         return myphoto
@@ -229,6 +235,7 @@ class GameOfLife(Tk.Frame):
                 save_all=True,
                 append_images=imagelist[1:],
                 optimize=True,
+                duration=300,  # *len(imagelist[:]),
                 loop=0,
             )
         else:

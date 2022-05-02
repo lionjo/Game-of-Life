@@ -35,6 +35,7 @@ class Grid:
         """
         height, width = np.shape(array)
         grid = cls(width, height)
+        grid.array = array
         grid.Rule = Rule(rule_array=rule_array)
         grid.calc_neighbours()
 
@@ -54,7 +55,7 @@ class Grid:
         """
         self.array = np.zeros((self.height, self.width), dtype=int)
 
-    def randomize(self, sparseness=2):
+    def randomize2(self, sparseness=2):
         """
         Initializes with random start values
         """
@@ -64,23 +65,39 @@ class Grid:
             ).astype(bool)
         ).astype(int)
 
-    def step(self, set_self=True):
+    def randomize(self, sparseness=2, width=5, height=5):
+        """
+        Initializes with random start values
+        """
+        middlearray = (
+            np.logical_not(np.random.randint(0, high=sparseness + 1, size=(height, width))).astype(
+                bool
+            )
+        ).astype(int)
+        self.array = np.zeros((self.height, self.width), dtype=int)
+        startx = int(self.height / 2 - height / 2)
+        starty = int(self.width / 2 - width / 2)
+        self.array[startx : startx + height, starty : starty + height] = middlearray
+
+    def step(self, set_self=True, check_periodicity=True):
         """
         Applies the rule once
 
         Args:
          - set_self (bool) : If to update itself
         """
-        self.calc_neighbours()
+        self.calc_neighbours_alternative()
 
         if set_self:
-            self.lastarrays[-1] = self.array
-            self.array = self.apply_rule()
-
-            self.lastarrays.append(self.array)
-
-            self.limit_lastarrays()
-            self.check_periodicity()
+            if check_periodicity:
+                self.lastarrays[-1] = self.array
+                self.array = self.apply_rule()
+                self.lastarrays.append(self.array)
+                self.limit_lastarrays()
+                self.check_periodicity()
+            else:
+                # Just do it quicker
+                self.array = self.apply_rule()
 
             return self.array
         else:
@@ -109,38 +126,93 @@ class Grid:
         for i, array_B in enumerate(reversed(self.lastarrays[:-1])):
             if np.all(array_A == array_B):
                 # periodic!
-                print("Periodic state found! Periodicity: ", i)
-                self.lastarrays = self.lastarrays[-(i + 1) :]
+                # print("Periodic state found! Periodicity: ", i)
+                self.lastarrays = self.lastarrays[-i:]
                 self.periodicity = i
                 return i
 
-    def multiple_steps(self, nsteps, set_self=True):
+    def multiple_steps(self, nsteps, set_self=True, check_periodicity=True, only_last=False):
         """
         Applies the rule multiple times
 
         Args:
          - set_self (bool) : If to update itself
         """
-        newarray = np.zeros((nsteps, np.shape(self.array)[0], np.shape(self.array)[1]))
-        for i in range(0, nsteps):
-            newarray[i] = self.step(set_self=set_self)
-        return newarray
+
+        if not only_last:
+            newarray = np.zeros((nsteps, np.shape(self.array)[0], np.shape(self.array)[1]))
+            for i in range(0, nsteps):
+                newarray[i] = self.step(set_self=set_self, check_periodicity=check_periodicity)
+            return newarray
+        else:
+            for i in range(0, nsteps):
+                self.step(set_self=set_self, check_periodicity=check_periodicity)
+            return self.array
 
     def apply_rule(self):
         """
         applies a rule to a certain entry
         """
-        no_states, no_neighbours = self.Rule.rule_array.shape
+        # no_states, no_neighbours = self.Rule.rule_array.shape
 
-        if self.array.any() > no_states:
-            print("Too many states for the applied rule set")
-            return
+        # Commented out for speed reasons
+        # if self.array.any() > no_states:
+        #    print("Too many states for the applied rule set")
+        #    return
 
-        if self.neighbouring_array.any() > no_neighbours:
-            print("Too many neighbours for the applied rule set")
-            return
+        # if self.neighbouring_array.any() > no_neighbours:
+        #    print("Too many neighbours for the applied rule set")
+        #    return
 
         return self.Rule.rule_array[self.array, self.neighbouring_array]
+
+    def calc_neighbours_alternative(self):
+        """
+        This is a little bit faster than np.roll
+        """
+        self.neighbouring_array *= 0
+        # roll in x
+        self.neighbouring_array[1:, :] += self.array[:-1, :]
+        self.neighbouring_array[0, :] += self.array[-1, :]
+
+        # roll in x
+        self.neighbouring_array[:-1, :] += self.array[1:, :]
+        self.neighbouring_array[-1, :] += self.array[0, :]
+
+        # roll in y
+        self.neighbouring_array[:, 1:] += self.array[:, :-1]
+        self.neighbouring_array[:, 0] += self.array[:, -1]
+
+        # roll in y
+        self.neighbouring_array[:, :-1] += self.array[:, 1:]
+        self.neighbouring_array[:, -1] += self.array[:, 0]
+
+        # roll in xy
+        self.neighbouring_array[1:, 1:] += self.array[:-1, :-1]
+        self.neighbouring_array[0, 0] += self.array[-1, -1]
+        self.neighbouring_array[1:, 0] += self.array[:-1, -1]
+        self.neighbouring_array[0, 1:] += self.array[-1, :-1]
+
+        # roll in xy
+        self.neighbouring_array[1:, :-1] += self.array[:-1, 1:]
+        self.neighbouring_array[0, -1] += self.array[-1, 0]
+        self.neighbouring_array[1:, -1] += self.array[:-1, 0]
+        self.neighbouring_array[0, :-1] += self.array[-1, 1:]
+
+        # roll in xy
+        self.neighbouring_array[:-1, 1:] += self.array[1:, :-1]
+        self.neighbouring_array[-1, 0] += self.array[0, -1]
+        self.neighbouring_array[-1, 1:] += self.array[0, :-1]
+        self.neighbouring_array[
+            :-1,
+            0,
+        ] += self.array[1:, -1]
+
+        # roll in xy
+        self.neighbouring_array[:-1, :-1] += self.array[1:, 1:]
+        self.neighbouring_array[-1, -1] += self.array[0, 0]
+        self.neighbouring_array[-1, :-1] += self.array[0, 1:]
+        self.neighbouring_array[:-1, -1] += self.array[1:, 0]
 
     def calc_neighbours(self):
         """
@@ -159,7 +231,7 @@ class Grid:
             print("Rule has more states than we can handle right now. Adjust rule.")
 
         if noneigh == 5:
-            result = (
+            self.neighbouring_array = (
                 np.roll(array, 1, axis=0)
                 + np.roll(array, -1, axis=0)
                 + np.roll(array, 1, axis=1)
@@ -168,7 +240,7 @@ class Grid:
 
         elif noneigh == 7:
             # Hexagonal Neighbourhood
-            result = (
+            self.neighbouring_array = (
                 np.roll(array, 1, axis=0)
                 + np.roll(array, -1, axis=0)
                 + np.roll(array, 1, axis=1)
@@ -178,20 +250,21 @@ class Grid:
             )
 
         elif noneigh == 9:
-            # Moore Neighbourhood
-            result = (
+            # Moore Neighbourhood (that's how this is called)
+
+            self.neighbouring_array = (
                 np.roll(array, 1, axis=0)
                 + np.roll(array, -1, axis=0)
                 + np.roll(array, 1, axis=1)
                 + np.roll(array, -1, axis=1)
-                + np.roll(np.roll(array, 1, axis=1), 1, axis=0)
-                + np.roll(np.roll(array, -1, axis=1), 1, axis=0)
-                + np.roll(np.roll(array, 1, axis=1), -1, axis=0)
-                + np.roll(np.roll(array, -1, axis=1), -1, axis=0)
+                + np.roll(array, [1, 1], axis=(1, 0))
+                + np.roll(array, [-1, 1], axis=(1, 0))
+                + np.roll(array, [1, -1], axis=(1, 0))
+                + np.roll(array, [-1, -1], axis=(1, 0))
             )
 
         elif noneigh == 13:
-            result = (
+            self.neighbouring_array = (
                 np.roll(array, 1, axis=0)
                 + np.roll(array, -1, axis=0)
                 + np.roll(array, 1, axis=1)
@@ -207,7 +280,7 @@ class Grid:
             )
 
         elif noneigh == 25:
-            result = (
+            self.neighbouring_array = (
                 np.roll(array, 1, axis=0)
                 + np.roll(array, -1, axis=0)
                 + np.roll(array, 1, axis=1)
@@ -236,5 +309,43 @@ class Grid:
         else:
             print("Rule has unhandable neighbours:", noneigh)
 
-        self.neighbouring_array = result
-        return result
+        return self.neighbouring_array
+
+    def get_PIL_Image(
+        self,
+    ):
+        """
+        Returns an PIL from the current array
+        """
+        import PIL
+        from PIL import ImageDraw
+
+        myphoto = (
+            PIL.Image.fromarray(np.invert(self.array.astype(bool)))
+            .resize((self.width * 10, self.height * 10), 0)
+            .convert("P")
+        )
+
+        # This draws the grid
+        step_size = 10
+        # Draw some lines
+        draw = ImageDraw.Draw(myphoto)
+        y_start = 0
+        y_end = myphoto.height
+
+        for x in range(0, myphoto.width + step_size, step_size):
+            if x == myphoto.width:
+                line = ((x - 1, y_start), (x - 1, y_end))
+            else:
+                line = ((x, y_start), (x, y_end))
+            draw.line(line, fill=128)
+        x_start = 0
+        x_end = myphoto.width
+        for y in range(0, myphoto.height + step_size, step_size):
+            if y == myphoto.height:
+                line = ((x_start, y - 1), (x_end, y - 1))
+            else:
+                line = ((x_start, y), (x_end, y))
+            draw.line(line, fill=128)
+        del draw
+        return myphoto

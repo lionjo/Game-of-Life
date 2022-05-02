@@ -28,7 +28,7 @@ class Rule:
         """
         string = "".join(map(str, np.transpose(np.flip(self.rule_array)).flatten()))
         # print("String: ",string)
-        return int(string, 2) + 1
+        return int(string, 2)
 
     def rulefromDEC(self, number, noneigh=9):
         """
@@ -38,7 +38,7 @@ class Rule:
             self.rule_array = np.flip(
                 np.transpose(
                     np.reshape(
-                        np.array(list(np.binary_repr(number - 1, width=2 * noneigh))), (noneigh, 2)
+                        np.array(list(np.binary_repr(number, width=2 * noneigh))), (noneigh, 2)
                     )
                 )
             ).astype(int)
