@@ -6,8 +6,8 @@
 
 Installation works by:
 ```bash
-git clone ...
-cd ...
+git clone git@github.com:lionjo/Game-of-Life.git
+cd Game-of-Life
 ```
 Then install using pip:
 ```bash
